@@ -19,7 +19,10 @@
         "no-tabs": "off",
         "no-mixed-spaces-and-tabs": "off",
         "no-restricted-globals": "off",
-        "prefer-destructuring": "off",
+        "no-console": "off",
+        "eqeqeq": "off",
+        "no-restricted-syntax": "off", 
+        "no-unused-expressions": "off",        
         "class-methods-use-this": "off"
     }
 }

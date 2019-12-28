@@ -21,20 +21,16 @@ export default class Message {
     this.messageConteiner.appendChild(this.author);
     this.messageConteiner.appendChild(this.text);
 
-   // this.author.innerHTML = `${this.mess.name}, ${this.mess.time}`;
     this.text.innerHTML = this.mess.message;
 
-    if(this.name === this.mess.name){
+    if (this.name === this.mess.name) {
       this.author.innerHTML = `You, ${this.mess.time}`;
-      this.messageConteiner.classList.add('right')
+      this.messageConteiner.classList.add('right');
       this.author.style.color = 'red';
-    } else{
+    } else {
       this.author.innerHTML = `${this.mess.name}, ${this.mess.time}`;
-      this.messageConteiner.classList.add('left')
+      this.messageConteiner.classList.add('left');
       this.author.style.color = 'black';
     }
-
-
   }
-  
 }

@@ -1,6 +1,5 @@
 import Message from './message.js';
 
-
 export default class Chat {
   constructor(parent) {
     this.parent = parent;
@@ -19,7 +18,6 @@ export default class Chat {
     this.ws = null;
     this.mes = null;
     this.mesForm = null;
-    //this.mesInput = document.createElement('input');
     this.mesLabel = null;
     this.mesButtonOk = null;
     this.mesButtonCanc = null;
@@ -41,10 +39,9 @@ export default class Chat {
     this.regForm.appendChild(this.regLabel);
     this.regForm.appendChild(this.regInput);
     this.regForm.appendChild(this.regButton);
-    this.regLabel.innerHTML = 'Выберите псевдоним';
+    this.regLabel.innerHTML = 'Выберите имя';
     this.regButton.innerHTML = 'Продолжить';
     this.regListeener();
-    
   }
 
   regListeener() {
@@ -55,17 +52,14 @@ export default class Chat {
         this.regInput.value = '';
         this.regMes.parentNode.removeChild(this.regMes);
         this.wsCreate();
-      //  this.chat();
       } else {
         this.regInput.value = 'Введите имя';
       }
     });
   }
 
-  chat() {  
+  chat() {
     console.log('Начать Чат');
-    console.log(this.name);
-
     this.divName = document.createElement('div');
     this.divMes = document.createElement('div');
     this.divChat = document.createElement('div');
@@ -88,105 +82,85 @@ export default class Chat {
     this.form.appendChild(this.input);
 
     this.inputEventListener();
-    this.ws.send(JSON.stringify({type: 'messageAll'}));
-
-
-    
-
+    this.ws.send(JSON.stringify({ type: 'messageAll' }));
   }
 
-  inputEventListener(){
-    this.input.addEventListener('keydown', (event) => {      
-      if(event.keyCode === 13){
+  inputEventListener() {
+    this.input.addEventListener('keydown', (event) => {
+      if (event.keyCode === 13) {
         event.preventDefault();
-        if(this.input.value != ''){
-          this.ws.send(JSON.stringify({type: 'message', name: this.name, message: this.input.value}));
+        if (this.input.value != '') {
+          this.ws.send(JSON.stringify({ type: 'message', name: this.name, message: this.input.value }));
           this.input.value = '';
         }
       }
-
-    })
+    });
   }
 
-  wsCreate(){
-    this.ws = new WebSocket('ws://localhost:7071/ws');
+  wsCreate() {
+    this.ws = new WebSocket('ws://chat11-server.herokuapp.com/ws');
     this.ws.binaryType = 'blob'; // arraybuffer
     this.ws.addEventListener('open', () => {
-      console.log('connected');     
-      this.ws.send(JSON.stringify({'type': 'input', 'name': this.name}));
-      //this.ws.send(JSON.stringify({name: this.name}));
-    // this.ws.send('hello');
-
+      console.log('connected');
+      this.ws.send(JSON.stringify({ type: 'input', name: this.name }));
     });
     this.ws.addEventListener('message', (evt) => {
-     let message = JSON.parse(evt.data);
-     if(message.type === 'input'){
-       if(message.name){
-         this.chat()
-       } else{
-         this.mess()
-       }
-     } else if(message.type === 'message'){
-      let mess = new Message(this.divMes, this.name, message);
-      mess.create();
-      //this.divMes.innerHTML = message.message;
-     }else if(message.type === 'messageAll'){
-      let messages = message.message;
-      for(let mess of messages){
-        let messOld = new Message(this.divMes, this.name, mess);
-      messOld.create();
-      }
-      
-      //this.divMes.innerHTML = message.message;
-     }else if(message.type === 'online?'){
-      this.ws.send(JSON.stringify({'type': 'online', 'name': this.name}));
-     }else if(message.type === 'online'){
-      this.divName.innerHTML = '';
-      for(let name of message.message){
-        let nameOnline = document.createElement('p'); 
-        nameOnline.innerHTML = name;
-        nameOnline.style.marginLeft = '10px';
-        if(name === this.name){
-          nameOnline.innerHTML = 'You';
-          nameOnline.style.color = 'red';
+      const message = JSON.parse(evt.data);
+      if (message.type === 'input') {
+        if (message.name) {
+          this.chat();
+        } else {
+          this.mess();
         }
-        this.divName.appendChild(nameOnline);
+      } else if (message.type === 'message') {
+        const mess = new Message(this.divMes, this.name, message);
+        mess.create();
+      } else if (message.type === 'messageAll') {
+        const messages = message.message;
+        for (const mess of messages) {
+          const messOld = new Message(this.divMes, this.name, mess);
+          messOld.create();
+        }
+      } else if (message.type === 'online?') {
+        this.ws.send(JSON.stringify({ type: 'online', name: this.name }));
+      } else if (message.type === 'online') {
+        this.divName.innerHTML = '';
+        for (const name of message.message) {
+          const nameOnline = document.createElement('p');
+          nameOnline.innerHTML = name;
+          nameOnline.style.marginLeft = '10px';
+          if (name === this.name) {
+            nameOnline.innerHTML = 'You';
+            nameOnline.style.color = 'red';
+          }
+          this.divName.appendChild(nameOnline);
+        }
       }
-     }
 
-     this.divMes
-     //let message = evt.data; 
-      
-      console.log(message);
+      this.divMes;
     });
     this.ws.addEventListener('close', (evt) => {
       console.log('connection closed', evt);
-      
     });
     this.ws.addEventListener('error', () => {
       console.log('error');
     });
-    
   }
 
-  mess(){
+  mess() {
     this.mes = document.createElement('div');
     this.mesForm = document.createElement('form');
-    //this.mesInput = document.createElement('input');
     this.mesLabel = document.createElement('label');
     this.mesButtonOk = document.createElement('button');
     this.mesButtonCanc = document.createElement('button');
     this.mes.setAttribute('class', 'regMes');
     this.mesForm.setAttribute('class', 'regForm');
-    //this.mesInput.setAttribute('class', 'regInput');
     this.mesLabel.setAttribute('class', 'regLabel');
-    //this.mesButton.setAttribute('class', 'regButton');
     this.mesButtonOk.setAttribute('class', 'regButton');
     this.mesButtonCanc.setAttribute('class', 'regButton');
     document.body.appendChild(this.mes);
     this.mes.appendChild(this.mesForm);
     this.mesForm.appendChild(this.mesLabel);
-   // this.mesForm.appendChild(this.mesInput);
     this.mesForm.appendChild(this.mesButtonOk);
     this.mesForm.appendChild(this.mesButtonCanc);
     this.mesLabel.innerHTML = 'Пользователя с таким именем не существует. Добавить?';
@@ -199,15 +173,12 @@ export default class Chat {
     this.mesButtonOk.addEventListener('click', (event) => {
       event.preventDefault();
       this.mes.parentNode.removeChild(this.mes);
-      this.ws.send(JSON.stringify({type: 'registration', name: this.name}));
-     // this.ws.send(JSON.stringify({type: 'regist', name: this.name}));
+      this.ws.send(JSON.stringify({ type: 'registration', name: this.name }));
     });
 
     this.mesButtonCanc.addEventListener('click', (event) => {
       event.preventDefault();
-      
-        this.mes.parentNode.removeChild(this.mes);
-        
-  })
-}
+      this.mes.parentNode.removeChild(this.mes);
+    });
+  }
 }
